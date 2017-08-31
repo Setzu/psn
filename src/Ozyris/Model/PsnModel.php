@@ -34,19 +34,9 @@ VALUES (:user_id, :psn_id, :country, :avatar_xl, :avatar_m, :friends_count, :tro
         }
 
         $sAvatarXl = $sAvatarM = '';
-        $aUserProfil = $aPsn['profile'];
-        $sPsnId = $aUserProfil['onlineId'];
-        $sCountry = array_key_exists('languagesUsed', $aUserProfil) ? $aUserProfil['languagesUsed'][0] : null;
-        $iFriendsCount = $aPsn['profile']['friendsCount'];
-        $iLevel = $aPsn['profile']['trophySummary']['level'];
-        $iProgress = $aPsn['profile']['trophySummary']['progress'];
-        $iBronze = $aPsn['profile']['trophySummary']['earnedTrophies']['bronze'];
-        $iSilver = $aPsn['profile']['trophySummary']['earnedTrophies']['silver'];
-        $iGold = $aPsn['profile']['trophySummary']['earnedTrophies']['gold'];
-        $iPlatinum = $aPsn['profile']['trophySummary']['earnedTrophies']['platinum'];
 
-        if (array_key_exists('avatarUrls', $aUserProfil)) {
-            foreach ($aUserProfil['avatarUrls'] as $aValue) {
+        if (array_key_exists('avatarUrls', $aPsn['profile'])) {
+            foreach ($aPsn['profile']['avatarUrls'] as $aValue) {
                 if ($aValue['size'] == 'xl') {
                     $sAvatarXl = $aValue['avatarUrl'];
                 } else {
@@ -54,23 +44,22 @@ VALUES (:user_id, :psn_id, :country, :avatar_xl, :avatar_m, :friends_count, :tro
                 }
             }
         }
-
 //        $sSerializedPsnInfos = serialize($aPsn);
         $iUserId = (int) $userId;
 
         try {
             $stmt->bindParam(':user_id', $iUserId);
-            $stmt->bindParam(':psn_id', $sPsnId);
-            $stmt->bindParam(':country', $sCountry);
+            $stmt->bindParam(':psn_id', $aPsn['profile']['onlineId']);
+            $stmt->bindParam(':country', $aPsn['profile']['languagesUsed'][0]);
             $stmt->bindParam(':avatar_xl', $sAvatarXl);
             $stmt->bindParam(':avatar_m', $sAvatarM);
-            $stmt->bindParam(':friends_count', $iFriendsCount);
-            $stmt->bindParam(':trophy_level', $iLevel);
-            $stmt->bindParam(':progress', $iProgress);
-            $stmt->bindParam(':bronze', $iBronze);
-            $stmt->bindParam(':silver', $iSilver);
-            $stmt->bindParam(':gold', $iGold);
-            $stmt->bindParam(':platinum', $iPlatinum);
+            $stmt->bindParam(':friends_count', $aPsn['profile']['friendsCount']);
+            $stmt->bindParam(':trophy_level', $aPsn['profile']['trophySummary']['level']);
+            $stmt->bindParam(':progress', $aPsn['profile']['trophySummary']['progress']);
+            $stmt->bindParam(':bronze', $aPsn['profile']['trophySummary']['earnedTrophies']['bronze']);
+            $stmt->bindParam(':silver', $aPsn['profile']['trophySummary']['earnedTrophies']['silver']);
+            $stmt->bindParam(':gold', $aPsn['profile']['trophySummary']['earnedTrophies']['gold']);
+            $stmt->bindParam(':platinum', $aPsn['profile']['trophySummary']['earnedTrophies']['platinum']);
 //            $stmt->bindParam(':serialized_psn_infos', $sSerializedPsnInfos);
 
             if (!$stmt->execute()) {
@@ -111,7 +100,35 @@ VALUES (:user_id, :psn_id, :country, :avatar_xl, :avatar_m, :friends_count, :tro
 
     public function updatePsnInfos()
     {
+        $sql = "UPDATE psn SET avatar_xl, avatar_m, friends_count, trophy_level, progress, bronze, silver, gold, platinum, last_update
+VALUES :avatar_xl, :avatar_m, :friends_count, :trophy_level, :progress, :bronze, :silver, :gold, :platinum, NOW()";
 
+        $stmt = $this->bdd->prepare($sql);
+
+        try {
+            $stmt->bindParam(':user_id', $iUserId);
+            $stmt->bindParam(':psn_id', $sPsnId);
+            $stmt->bindParam(':country', $sCountry);
+            $stmt->bindParam(':avatar_xl', $sAvatarXl);
+            $stmt->bindParam(':avatar_m', $sAvatarM);
+            $stmt->bindParam(':friends_count', $iFriendsCount);
+            $stmt->bindParam(':trophy_level', $iLevel);
+            $stmt->bindParam(':progress', $iProgress);
+            $stmt->bindParam(':bronze', $iBronze);
+            $stmt->bindParam(':silver', $iSilver);
+            $stmt->bindParam(':gold', $iGold);
+            $stmt->bindParam(':platinum', $iPlatinum);
+
+            if (!$stmt->execute()) {
+//                $aSqlErrors = $stmt->errorInfo();
+                throw new \Exception(parent::SQL_ERROR);
+            }
+
+        } catch (\Exception $e) {
+            die($e->getMessage());
+        }
+
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
 }

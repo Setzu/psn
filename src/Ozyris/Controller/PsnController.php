@@ -86,13 +86,7 @@ class PsnController extends AbstractController
 
     public function updatePsnAction()
     {
-        echo'<pre>';var_dump($_SESSION);die;
-        if (
-            !array_key_exists('isAuthentified', $_SESSION) ||
-            $_SESSION['isAuthentified'] == false ||
-            array_key_exists('psn', $_SESSION) ||
-            $_SESSION['psn'] == false
-        ) {
+        if (is_null($this->getSessionValue('isAuthentified')) || is_null($this->getSessionValue('psn'))) {
             return $this->redirect();
         }
 

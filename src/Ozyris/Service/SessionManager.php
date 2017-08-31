@@ -78,7 +78,7 @@ abstract class SessionManager
     }
 
     /**
-     * Récupère toute la session
+     * Récupère toute la session, la démarre si ce n'est pas le cas
      *
      * @return array
      */
