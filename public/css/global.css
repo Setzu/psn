@@ -1,0 +1,43 @@
+body {
+    background-color: #dddddd;
+}
+table.dataTable thead th, table.dataTable thead td, table.dataTable.no-footer {
+    border-bottom: 1px solid #ddd !important;
+}
+.display-none {
+    display: none;
+}
+tr.depot > td {
+    background-color: #d9edf7;
+}
+tr.retrait > td {
+    background-color: #fcf8e3;
+}
+.pointer {
+    cursor: pointer;
+}
+
+#loader {
+    display: none;
+    position : fixed;
+    z-index: 9999;
+    background : rgba(255, 255, 255, 0.5) url('/img/loader-psn.gif') 47% 45% no-repeat;
+    top: 0;
+    left: 0;
+    height : 100%;
+    width : 100%;
+    cursor : wait;
+    margin: 0;
+}
+
+#loader > img {
+    display: block;
+    position: fixed;
+    z-index: 9999;
+    top: 35%;
+    left: 42%;
+}
+
+#dropdownMenu1:hover {
+    cursor: pointer;
+}
