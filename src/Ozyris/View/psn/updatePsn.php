@@ -11,7 +11,7 @@
     <br>
 </div>
 <div class="col-md-4 col-md-offset-3">
-    <p>Actualiser mes informationss provenant du PSN</p>
+    <p>Actualiser mes informations provenants du PSN</p>
     <form action="/psn/updatePsn" method="post" role="form">
         <div class="form-group">
             <label for="password">Mot de passe :

@@ -14,14 +14,15 @@ class PsnModel extends AbstractModel
 
     /**
      * @param int $userId
+     * @param $sPsnEmail
      * @param array $aPsn
      * @return bool
      * @throws \Exception
      */
-    public function addPsn($userId, array $aPsn)
+    public function addPsn($userId, $sPsnEmail, array $aPsn)
     {
-        $sql = "INSERT INTO psn (user_id, psn_id, country, avatar_xl, avatar_m, friends_count, trophy_level, progress, bronze, silver, gold, platinum)
-VALUES (:user_id, :psn_id, :country, :avatar_xl, :avatar_m, :friends_count, :trophy_level, :progress, :bronze, :silver, :gold, :platinum)";
+        $sql = "INSERT INTO psn (user_id, psn_email, psn_id, country, avatar_xl, avatar_m, friends_count, trophy_level, progress, bronze, silver, gold, platinum)
+VALUES (:user_id, :psn_email, :psn_id, :country, :avatar_xl, :avatar_m, :friends_count, :trophy_level, :progress, :bronze, :silver, :gold, :platinum)";
         $stmt = $this->bdd->prepare($sql);
 
         if (
@@ -50,6 +51,7 @@ VALUES (:user_id, :psn_id, :country, :avatar_xl, :avatar_m, :friends_count, :tro
         try {
             $stmt->bindParam(':user_id', $iUserId);
             $stmt->bindParam(':psn_id', $aPsn['profile']['onlineId']);
+            $stmt->bindParam(':psn_email', $sPsnEmail);
             $stmt->bindParam(':country', $aPsn['profile']['languagesUsed'][0]);
             $stmt->bindParam(':avatar_xl', $sAvatarXl);
             $stmt->bindParam(':avatar_m', $sAvatarM);
@@ -98,26 +100,27 @@ VALUES (:user_id, :psn_id, :country, :avatar_xl, :avatar_m, :friends_count, :tro
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    public function updatePsnInfos()
+    public function updatePsnInfos(array $aPsnInfos)
     {
-        $sql = "UPDATE psn SET avatar_xl, avatar_m, friends_count, trophy_level, progress, bronze, silver, gold, platinum, last_update
-VALUES :avatar_xl, :avatar_m, :friends_count, :trophy_level, :progress, :bronze, :silver, :gold, :platinum, NOW()";
+        $sql = "UPDATE psn 
+SET avatar_xl = :avatar_xl, avatar_m = :avatar_m, friends_count = :friends_count, trophy_level = :trophy_level, 
+progress = :progress, bronze = :bronze, silver = :silver, gold = :gold, platinum = :platinum, last_update = :last_update
+WHERE psn_id = :psn_id";
 
         $stmt = $this->bdd->prepare($sql);
 
         try {
-            $stmt->bindParam(':user_id', $iUserId);
-            $stmt->bindParam(':psn_id', $sPsnId);
-            $stmt->bindParam(':country', $sCountry);
-            $stmt->bindParam(':avatar_xl', $sAvatarXl);
-            $stmt->bindParam(':avatar_m', $sAvatarM);
-            $stmt->bindParam(':friends_count', $iFriendsCount);
-            $stmt->bindParam(':trophy_level', $iLevel);
-            $stmt->bindParam(':progress', $iProgress);
-            $stmt->bindParam(':bronze', $iBronze);
-            $stmt->bindParam(':silver', $iSilver);
-            $stmt->bindParam(':gold', $iGold);
-            $stmt->bindParam(':platinum', $iPlatinum);
+            $stmt->bindParam(':psn_id', $aPsnInfos['profile']['onlindeId']);
+            $stmt->bindParam(':avatar_xl', $aPsnInfos['profile']['avatarUrls'][0]['avatar_xl']);
+            $stmt->bindParam(':avatar_m', $aPsnInfos['profile']['avatarUrls'][1]['avatar_m']);
+            $stmt->bindParam(':friends_count', $aPsnInfos['profile']['friends_count']);
+            $stmt->bindParam(':trophy_level', $aPsnInfos['profile']['trophySummary']['level']);
+            $stmt->bindParam(':progress', $aPsnInfos['profile']['trophySummary']['progress']);
+            $stmt->bindParam(':bronze', $aPsnInfos['profile']['trophySummary']['earnedTrophies']['bronze']);
+            $stmt->bindParam(':silver', $aPsnInfos['profile']['trophySummary']['earnedTrophies']['silver']);
+            $stmt->bindParam(':gold', $aPsnInfos['profile']['trophySummary']['earnedTrophies']['gold']);
+            $stmt->bindParam(':platinum', $aPsnInfos['profile']['trophySummary']['earnedTrophies']['platinum']);
+            $stmt->bindParam(':last_update', date('d-m-Y H:i:s'));
 
             if (!$stmt->execute()) {
 //                $aSqlErrors = $stmt->errorInfo();

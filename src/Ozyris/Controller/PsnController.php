@@ -10,6 +10,7 @@ namespace Ozyris\Controller;
 
 use Ozyris\Form\Form;
 use Ozyris\Model\PsnModel;
+use Ozyris\Model\TokensModel;
 use \PSN\Auth;
 use \PSN\User;
 use \PSN\AuthException;
@@ -60,11 +61,13 @@ class PsnController extends AbstractController
 
             try {
                 $account = new Auth($aFormValues['psnid'], $aFormValues['password']);
+                $oTokensModel = new TokensModel();
+                $oTokensModel->insertTokens($oUser->getId(), $account->GetTokens());
                 $oPsnUser = new User($account->GetTokens());
                 $oPsnModel = new PsnModel();
 
                 // On enregistre en BDD les infos venant du PlayStation Network
-                $oPsnModel->addPsn($oUser->getId(), $oPsnUser->Me());
+                $oPsnModel->addPsn($oUser->getId(), $aFormValues['psnid'], $oPsnUser->Me());
 
                 // On enregistre en session les informations liés au PSN de l'utilisateur
                 $this->setSessionValues([
@@ -73,7 +76,10 @@ class PsnController extends AbstractController
 
             } catch (AuthException $e) {
 //                header("Content-Type: application/json");
-                echo '<pre>' . $e->GetError() . '</pre>';
+//                echo '<pre>' . $e->GetError() . '</pre>';
+                $this->setFlashMessage("Le couple adresse email et mot de passe saisi est incorrect", false);
+
+                return $this->redirect('psn', 'addPsn');
             }
 
             $this->setFlashMessage('Votre compte a été ajouté avec succès', false);
@@ -92,15 +98,20 @@ class PsnController extends AbstractController
 
         if (!empty($_POST)) {
             $aFormValues = Form::getFormValues();
+            $aPsn = $this->getSessionValue('psn');
 
             try {
-                $account = new Auth($aFormValues['psnid'], $aFormValues['password']);
+                Auth::GrabNewTokens($aPsn['refresh_token']);
+                $account = new Auth($aPsn['psn_email'], $aFormValues['password']);
                 $oPsnUser = new User($account->GetTokens());
                 $oPsnModel = new PsnModel();
                 $oPsnModel->updatePsnInfos($oPsnUser->Me());
             } catch (AuthException $e) {
 //                header("Content-Type: application/json");
-                echo '<pre>' . $e->GetError() . '</pre>';
+//                echo '<pre>' . $e->GetError() . '</pre>';
+                $this->setFlashMessage('Le mot de passe saisi est incorrect', false);
+
+                return $this->redirect('psn', 'updatePsn');
             }
 
             $this->setFlashMessage('Vos informations ont été mises à jour avec succès', false);

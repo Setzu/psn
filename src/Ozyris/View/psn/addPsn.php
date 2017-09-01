@@ -14,8 +14,8 @@
 <div class="col-md-4 col-md-offset-3">
     <form action="/psn/addPsn" method="post" role="form">
         <div class="form-group">
-            <label for="psnid">ID PSN (adresse email ou pseudo) :
-                <input type="text" name="psnid" required="required" placeholder="id psn" class="form-control">
+            <label for="psnid">ID PSN :
+                <input type="text" name="psnid" required="required" placeholder="adresse email" class="form-control">
             </label>
             <label for="password">Mot de passe :
                 <input type="password" name="password" required="required" class="form-control">

@@ -26,6 +26,7 @@
             <?= $this->aPsnInfos['progress']; ?>%
         </div>
     </div>
+    <p>Amis : <?= $this->aPsnInfos['friends_count']; ?></p>
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -44,6 +45,7 @@
         </tr>
         </tbody>
     </table>
+    <p>Dernière mise à jour le : <?= $this->aPsnInfos['last_update']; ?></p>
     <a href="/psn/updatePsn" class="btn btn-info">Actualiser mes infos<a>
 </div>
 <?php } ?>
