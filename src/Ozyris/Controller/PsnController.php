@@ -11,8 +11,10 @@ namespace Ozyris\Controller;
 use Ozyris\Form\Form;
 use Ozyris\Model\PsnModel;
 use Ozyris\Model\TokensModel;
+use Ozyris\Model\TrophyModel;
 use \PSN\Auth;
 use \PSN\User;
+use \PSN\Trophy;
 use \PSN\AuthException;
 
 class PsnController extends AbstractController
@@ -63,13 +65,25 @@ class PsnController extends AbstractController
                 $account = new Auth($aFormValues['psnid'], $aFormValues['password']);
                 $oTokensModel = new TokensModel();
                 $oTokensModel->insertTokens($oUser->getId(), $account->GetTokens());
+                $oTrophies = new Trophy($account->GetTokens());
+                $oUserTrophies = $oTrophies->GetMyTrophies();
+                $oTrophyModel = new TrophyModel();
+
+                if (property_exists($oUserTrophies, 'trophyTitles') && count($oUserTrophies->trophyTitles) > 0) {
+                    foreach ($oUserTrophies->trophyTitles as $oTrophy) {
+                        if ($oTrophy->fromUser->earnedTrophies->platinum == 1) {
+                            $oTrophyModel->insertTrophy($aFormValues['psnid'], $oTrophy);
+                        }
+                    }
+                }
+
                 $oPsnUser = new User($account->GetTokens());
                 $oPsnModel = new PsnModel();
 
                 // On enregistre en BDD les infos venant du PlayStation Network
                 $oPsnModel->addPsn($oUser->getId(), $aFormValues['psnid'], $oPsnUser->Me());
 
-                // On enregistre en session les informations liés au PSN de l'utilisateur
+                // On enregistre en session les informations liées au PSN de l'utilisateur
                 $this->setSessionValues([
                     'psn' => $oPsnModel->selectPsnById($oUser->getId())
                 ]);

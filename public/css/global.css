@@ -41,3 +41,6 @@ tr.retrait > td {
 #dropdownMenu1:hover {
     cursor: pointer;
 }
+.actu {
+    border: 1px solid #dddddd;
+}

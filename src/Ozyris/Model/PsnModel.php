@@ -65,7 +65,7 @@ VALUES (:user_id, :psn_email, :psn_id, :country, :avatar_xl, :avatar_m, :friends
 //            $stmt->bindParam(':serialized_psn_infos', $sSerializedPsnInfos);
 
             if (!$stmt->execute()) {
-//                $aSqlError = $stmt->errorInfo();
+//                echo'<pre>';var_dump($stmt->errorInfo());die;
                 throw new \Exception(parent::SQL_ERROR);
             }
         } catch(\Exception $e) {
@@ -98,6 +98,56 @@ VALUES (:user_id, :psn_email, :psn_id, :country, :avatar_xl, :avatar_m, :friends
         }
 
         return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * @param int $id
+     * @return string
+     */
+    public function selectPsnIdById($id)
+    {
+        $sql = "SELECT psn_id FROM psn WHERE id = :id";
+        $stmt = $this->bdd->prepare($sql);
+        $iId = (int) $id;
+
+        try {
+            $stmt->bindParam(':id', $iId);
+
+            if (!$stmt->execute()) {
+//                echo'<pre>';var_dump($stmt->errorInfo());die;
+                throw new \Exception(parent::SQL_ERROR);
+            }
+
+        } catch (\Exception $e) {
+            die($e->getMessage());
+        }
+
+        return $stmt->fetchColumn();
+    }
+
+    /**
+     * @param int $id
+     * @return mixed
+     */
+    public function selectAvatarMById($id)
+    {
+        $sql = "SELECT avatar_m FROM psn WHERE id = :id";
+        $stmt = $this->bdd->prepare($sql);
+        $iId = (int) $id;
+
+        try {
+            $stmt->bindParam(':id', $iId);
+
+            if (!$stmt->execute()) {
+//                $aSqlErrors = $stmt->errorInfo();
+                throw new \Exception(parent::SQL_ERROR);
+            }
+
+        } catch (\Exception $e) {
+            die($e->getMessage());
+        }
+
+        return $stmt->fetchColumn();
     }
 
     public function updatePsnInfos(array $aPsnInfos)

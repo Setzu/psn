@@ -32,7 +32,7 @@ class TokensModel extends AbstractModel
 //            $stmt->bindParam(':serialized_psn_infos', $sSerializedPsnInfos);
 
             if (!$stmt->execute()) {
-//                $aSqlError = $stmt->errorInfo();
+//                echo'<pre>';var_dump($stmt->errorInfo());die;
                 throw new \Exception(parent::SQL_ERROR);
             }
         } catch(\Exception $e) {
